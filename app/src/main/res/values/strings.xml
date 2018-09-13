@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Canvas</string>
+    <string name="save">Save</string>
+    <string name="_new">New</string>
+    <string name="erase">Erase</string>
+    <string name="add">Add</string>
+    <string name="permission_header">Write External Storage permission</string>
+    <string name="permission_message">Write External Storage permission is needed to save pictures</string>
+    <string name="string_ok">OK</string>
+</resources>
