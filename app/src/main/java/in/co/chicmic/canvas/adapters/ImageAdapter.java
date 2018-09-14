@@ -3,12 +3,18 @@ package in.co.chicmic.canvas.adapters;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import in.co.chicmic.canvas.R;
@@ -34,7 +40,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull final ImageAdapter.ViewHolder holder, int position) {
-        holder.mGalleryImage.setImageURI(Uri.parse(mAllImageList.get(position)));
+        Picasso.get()
+                .load("file:///" + mAllImageList.get(position))
+                .into(holder.mGalleryImage);
+        // holder.mGalleryImage.setImageURI(Uri.parse(mAllImageList.get(position)));
         holder.mParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
