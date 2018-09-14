@@ -7,11 +7,11 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import in.co.chicmic.canvas.R;
+import in.co.chicmic.canvas.utilities.Constants;
 
 import static in.co.chicmic.canvas.utilities.Constants.sTOUCH_TOLERANCE;
 
@@ -27,10 +27,6 @@ public class CanvasView extends View {
     private boolean isEraseModeOn = false;
 
     public CanvasView(Context context) {
-        this(context, null);
-    }
-
-    public CanvasView(Context context, AttributeSet attributeSet) {
         super(context);
         mBackgroundColor = ResourcesCompat.getColor(getResources(),
                 R.color.opaque_orange, null);
@@ -53,15 +49,15 @@ public class CanvasView extends View {
         mPaint.setStrokeWidth(12); // default: Hairline-width (really thin)
 
         // Create bitmap, create canvas with bitmap, fill canvas with color.
-        mExtraBitmap = Bitmap.createBitmap(720, 1200,
+        mExtraBitmap = Bitmap.createBitmap(Constants.sCANVAS_WIDTH, Constants.sCANVAS_HEIGHT,
                 Bitmap.Config.ARGB_8888);
         mExtraCanvas = new Canvas(mExtraBitmap);
         // Fill the Bitmap with the background color.
         mExtraCanvas.drawColor(mBackgroundColor);
-
-        // Calculate the rect a frame around the picture.
-        int inset = 40;
-        mFrame = new Rect(inset, inset, 720 - inset, 1200 - inset);
+        mFrame = new Rect(Constants.sINSET, Constants.sINSET
+                , Constants.sCANVAS_WIDTH - Constants.sINSET
+                , Constants.sCANVAS_HEIGHT - Constants.sINSET
+        );
     }
 
     @Override
@@ -73,7 +69,7 @@ public class CanvasView extends View {
         // Draw a frame around the picture.
         canvas.drawRect(mFrame, mPaint);
         // Draw the bitmap that has the saved path.
-        canvas.drawBitmap(mExtraBitmap, 0, 0, null);
+        canvas.drawBitmap(mExtraBitmap, Constants.sLEFT, Constants.sTOP, null);
     }
 
     @Override
@@ -137,9 +133,10 @@ public class CanvasView extends View {
     public void setBitmap(Bitmap bitmap){
         mExtraBitmap = bitmap.copy(bitmap.getConfig(), true);
         mExtraCanvas = new Canvas(mExtraBitmap);
-        // Calculate the rect a frame around the picture.
-        int inset = 40;
-        mFrame = new Rect(inset, inset, 720 - inset, 1200 - inset);
+        mFrame = new Rect(Constants.sINSET, Constants.sINSET
+                , Constants.sCANVAS_WIDTH - Constants.sINSET
+                , Constants.sCANVAS_HEIGHT - Constants.sINSET
+        );
     }
 
     public void setEraseModeSwitch(){

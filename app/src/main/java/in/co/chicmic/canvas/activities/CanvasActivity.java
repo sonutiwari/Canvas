@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -37,7 +38,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private Button mEraseButton;
     private Button mNewButton;
     private LinearLayout mParentLL;
-    private Bitmap mImage;
+    private PermissionListener dialogPermissionListener;
+    private boolean isEraseModeEnabled = true;
 
     String mPath;
     private boolean isAddOptionEnabled = false;
@@ -45,9 +47,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = getLayoutInflater().inflate(R.layout.activity_canvas, null);
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        setContentView(view);
+        setContentView(R.layout.activity_canvas);
         initViews();
         setListeners();
     }
@@ -58,6 +58,13 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         mEraseButton  = findViewById(R.id.btn_eraser);
         mNewButton  = findViewById(R.id.btn_new);
         mParentLL = findViewById(R.id.canvas_view);
+        dialogPermissionListener =
+        DialogOnDeniedPermissionListener.Builder
+                .withContext(this)
+                .withTitle(R.string.permission_header)
+                .withMessage(R.string.permission_message)
+                .withButtonText(R.string.string_ok)
+                .build();
     }
 
     private void setListeners(){
@@ -95,6 +102,12 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_eraser:
                 if (mCanvasView != null){
                     mCanvasView.setEraseModeSwitch();
+                    isEraseModeEnabled = !isEraseModeEnabled;
+                }
+                if (isEraseModeEnabled){
+                    mEraseButton.setText(R.string.erase);
+                } else {
+                    mEraseButton.setText(R.string.draw);
                 }
                 break;
             case R.id.btn_new:
@@ -121,8 +134,17 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void showAllCanvasImages() {
-        startActivity(new Intent(this, GalleryActivity.class));
-        finish();
+        String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        int res = this.checkCallingOrSelfPermission(permission);
+        if (res == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(this, GalleryActivity.class));
+            finish();
+        } else {
+            Dexter.withActivity(this)
+                    .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .withListener(dialogPermissionListener)
+                    .check();
+        }
     }
 
     private void setNewCanvas() {
@@ -132,21 +154,12 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
-    PermissionListener dialogPermissionListener =
-            DialogOnDeniedPermissionListener.Builder
-                    .withContext(this)
-                    .withTitle(R.string.permission_header)
-                    .withMessage(R.string.permission_message)
-                    .withButtonText(R.string.string_ok)
-                    .build();
-
-
     private void saveToGallery() {
-        mImage = mCanvasView.getBitmap();
+        Bitmap mImage = mCanvasView.getBitmap();
         if (isAddOptionEnabled){
             File file = new File(mPath);
             try(FileOutputStream outputStream = new FileOutputStream(file)){
-                mImage.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                mImage.compress(Bitmap.CompressFormat.PNG, Constants.sQUALITY, outputStream);
             } catch (IOException e){
                 e.printStackTrace();
             }
@@ -159,6 +172,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
         setNewCanvas();
+        Snackbar.make(mParentLL, R.string.successfully_saved, Snackbar.LENGTH_SHORT).show();
     }
 
     private void saveToAppStorage(Bitmap image) {

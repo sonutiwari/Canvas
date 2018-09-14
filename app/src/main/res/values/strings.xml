@@ -7,4 +7,6 @@
     <string name="permission_header">Write External Storage permission</string>
     <string name="permission_message">Write External Storage permission is needed to save pictures</string>
     <string name="string_ok">OK</string>
+    <string name="draw">Draw</string>
+    <string name="successfully_saved">Saved Successfully</string>
 </resources>

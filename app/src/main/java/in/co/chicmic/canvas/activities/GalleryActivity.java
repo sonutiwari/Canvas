@@ -75,8 +75,14 @@ public class GalleryActivity extends AppCompatActivity implements RecyclerClickL
 
         for(int i=0;i<dirList.size();i++)
         {
-            File imageDir = new File(directories[i]);
-            File[] imageList = imageDir.listFiles();
+            File imageDir = null;
+            if (directories != null) {
+                imageDir = new File(directories[i]);
+            }
+            File[] imageList = new File[0];
+            if (imageDir != null) {
+                imageList = imageDir.listFiles();
+            }
             if(imageList == null)
                 continue;
             for (File imagePath : imageList) {
@@ -84,7 +90,7 @@ public class GalleryActivity extends AppCompatActivity implements RecyclerClickL
 
                     if(imagePath.isDirectory())
                     {
-                        imagePath.listFiles();
+                        File[] files = imagePath.listFiles();
 
                     }
                     if (imagePath.getName().contains(".png") || imagePath.getName().contains(".PNG"))
